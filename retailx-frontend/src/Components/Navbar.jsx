@@ -42,6 +42,7 @@ export default function Navbar() {
             </div>
             <NavLink to="/deals">Deals</NavLink>
             <NavLink to="/admin-auth" className="text-slate-500 italic">Admin</NavLink>
+            <NavLink to="/seller-auth" className="text-slate-500 italic">Seller</NavLink>
           </div>
 
           <div className="h-6 w-[1px] bg-slate-200 hidden md:block" />

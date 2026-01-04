@@ -135,11 +135,7 @@ function InsightsView() {
         <StatCard label="Revenue" value="₹8.2L" trend="+18%" up={true} />
       </div>
       
-      <div className="h-80 rounded-3xl bg-slate-50 border border-slate-200/60 flex flex-col items-center justify-center relative overflow-hidden">
-         <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:20px_20px]" />
-         <BarChart3 size={48} className="text-slate-300 mb-4" />
-         <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Growth Velocity Chart</p>
-      </div>
+      
     </div>
   );
 }

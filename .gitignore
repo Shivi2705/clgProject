@@ -1,0 +1,10 @@
+# Node / frontend
+retailx-frontend/node_modules/
+retailx-frontend/dist/
+retailx-frontend/build/
+retailx-frontend/.env
+
+# Python / backend
+retailx-backend/__pycache__/
+retailx-backend/venv/
+retailx-backend/.env

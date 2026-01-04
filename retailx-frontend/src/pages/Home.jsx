@@ -17,7 +17,7 @@ const SLIDES = [
   { 
     id: 2, 
     title: "PRECISION TECH", 
-    desc: "Experience hardware that predicts your needs.",
+    desc: "Experience software that predicts your needs.",
     img: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&q=80&w=2000", 
   },
   { 
