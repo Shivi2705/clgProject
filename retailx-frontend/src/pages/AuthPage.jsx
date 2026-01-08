@@ -21,12 +21,33 @@ export default function AuthPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
+  const [error, setError] = useState(""); // New state for error messages
 
   const navigate = useNavigate();
 
+  // Password validation regex: min 8, at least 1 uppercase, at least 1 special char
+  const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*[\W_]).{8,}$/;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(""); // clear previous errors
     setIsLoading(true);
+
+    // Frontend password validation
+    if (mode === "register") {
+      if (!PASSWORD_REGEX.test(password)) {
+        setIsLoading(false);
+        setError(
+          "Password must be at least 8 characters long and include an uppercase letter and a special character."
+        );
+        return;
+      }
+      if (password !== confirmPassword) {
+        setIsLoading(false);
+        setError("Passwords do not match.");
+        return;
+      }
+    }
 
     try {
       let url = "http://127.0.0.1:5000/api/auth/register";
@@ -47,13 +68,16 @@ export default function AuthPage() {
 
       if (!response.ok) throw new Error(data.message || "Failed");
 
+      // Save token
+      localStorage.setItem("userToken", data.token);
+
       if (mode === "register") {
-        navigate("/preferences"); // after register
+        navigate("/preferences");
       } else {
-        navigate("/"); // after login
+        navigate("/");
       }
     } catch (err) {
-      alert(err.message);
+      setError(err.message || "Something went wrong");
     } finally {
       setIsLoading(false);
     }
@@ -84,6 +108,13 @@ export default function AuthPage() {
                   : "Join thousands of businesses managing with RetailX."}
               </p>
             </div>
+
+            {/* Error message */}
+            {error && (
+              <div className="mb-4 p-3 rounded-md bg-red-100 text-red-700 text-sm font-medium">
+                {error}
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <AnimatePresence mode="popLayout">
@@ -178,6 +209,7 @@ export default function AuthPage() {
   );
 }
 
+// Input component
 function Input({ label, icon: Icon, value, setValue, placeholder, field, focusedField, setFocusedField }) {
   return (
     <div className="space-y-1.5">
@@ -197,6 +229,7 @@ function Input({ label, icon: Icon, value, setValue, placeholder, field, focused
   );
 }
 
+// PasswordInput component
 function PasswordInput({ label, value, setValue, show, toggle, field, focusedField, setFocusedField, placeholder }) {
   return (
     <div className="space-y-1.5">

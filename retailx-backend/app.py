@@ -4,19 +4,29 @@ from dotenv import load_dotenv
 import os
 
 from extensions import mongo, bcrypt, jwt
-from routes.seller_routes import seller_bp
 from routes.auth_routes import auth_bp
 from routes.admin_routes import admin_bp
+from routes.seller_routes import seller_bp
+from routes.preferences_routes import preferences_bp
 
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+
+CORS(
+    app,
+    resources={r"/api/*": {"origins": "*"}},
+    supports_credentials=True
+)
 
 # CONFIG
 app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
+
+app.config["JWT_TOKEN_LOCATION"] = ["headers"]
+app.config["JWT_HEADER_NAME"] = "Authorization"
+app.config["JWT_HEADER_TYPE"] = "Bearer"
 
 # INIT EXTENSIONS
 mongo.init_app(app)
@@ -26,7 +36,8 @@ jwt.init_app(app)
 # ROUTES
 app.register_blueprint(auth_bp, url_prefix="/api/auth")
 app.register_blueprint(admin_bp, url_prefix="/api/admin")
-app.register_blueprint(seller_bp)
+app.register_blueprint(seller_bp, url_prefix="/api/seller")
+app.register_blueprint(preferences_bp, url_prefix="/api")
 
 @app.route("/test-db")
 def test_db():
