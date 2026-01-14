@@ -1,7 +1,8 @@
+
 import { useSearchParams, Link, useNavigate } from "react-router-dom"; // useNavigate add kiya
 import { useEffect, useState, useMemo, useContext } from "react"; // useContext add kiya
 import { CartContext } from "../App"; // CartContext import kiya
-import Navbar from "../components/Navbar";
+import Navbar from "../Components/Navbar";
 import Footer from "../components/Footer";
 
 
@@ -18,23 +19,33 @@ export default function SearchResults() {
   const [selectedBrand, setSelectedBrand] = useState("All");
   const [maxPrice, setMaxPrice] = useState(100000); 
   const [visibleCount, setVisibleCount] = useState(8);
+const category = searchParams.get("category");
+
 
   useEffect(() => {
-    const fetchResults = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(`http://127.0.0.1:5000/api/search?q=${query}`);
-        const data = await response.json();
-        setProducts(data);
-        setVisibleCount(8);
-      } catch (error) {
-        console.error("Search error:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    if (query) fetchResults();
-  }, [query]);
+  const fetchResults = async () => {
+    setLoading(true);
+    try {
+      let url = "http://127.0.0.1:5000/api/products?";
+
+      if (query) url += `q=${query}&`;
+      if (category) url += `category=${category}`;
+
+      const response = await fetch(url);
+      const data = await response.json();
+
+      setProducts(data);
+      setVisibleCount(8);
+    } catch (error) {
+      console.error("Fetch error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (query || category) fetchResults();
+}, [query, category]);
+
 
   // --- LOGIC: Add to Cart and Redirect ---
   const handleAddToCart = (p) => {
@@ -78,8 +89,15 @@ export default function SearchResults() {
         
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
           <h1 className="text-xl md:text-2xl font-semibold text-gray-800">
-            Results for "{query}" <span className="text-gray-400 font-normal">({filteredProducts.length} items)</span>
-          </h1>
+          {category
+            ? `Category: ${category}`
+            : `Results for "${query}"`
+          }
+          <span className="text-gray-400 font-normal">
+            ({filteredProducts.length} items)
+          </span>
+        </h1>
+
 
           <div className="flex flex-wrap gap-4 items-center">
             <select 

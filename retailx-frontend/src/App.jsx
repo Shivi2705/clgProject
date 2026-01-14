@@ -9,15 +9,44 @@ import PreferencesPage from "./pages/PreferencesPage";
 import AdminAuth from "./pages/AdminAuth";
 import SellerDashboard from "./pages/SellerDashboard";
 import SellerAuth from "./pages/SellerAuth";
+import CategoryPage from "./pages/CategoryPage";
+import SearchResults from "./pages/SearchResults";
+import ProductPage from "./pages/ProductPage";
+import Checkout from "./pages/Checkout";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import UserDashboard from "./pages/UserDashboard";
 
 // ✅ CONTEXT CREATE
 export const CartContext = createContext();
 
+
+
 function App() {
-  const [cart, setCart] = useState([]); // ✅ global cart state
+  const [cart, setCart] = useState([]);
+
+  const addToCart = (product) => {
+    console.log("ADD TO CART CLICKED:", product);
+
+    setCart((prevCart) => {
+      const existingItem = prevCart.find(
+        (item) => item.id === product.id
+      );
+
+      if (existingItem) {
+        return prevCart.map((item) =>
+          item.id === product.id
+            ? { ...item, quantity: (item.quantity || 1) + 1 }
+            : item
+        );
+      }
+
+      return [...prevCart, { ...product, quantity: 1 }];
+    });
+  };
 
   return (
-    <CartContext.Provider value={{ cart, setCart }}>
+      <CartContext.Provider value={{ cart, setCart, addToCart }}>
+
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -26,8 +55,21 @@ function App() {
           <Route path="/seller-auth" element={<SellerAuth />} />
           <Route path="/preferences" element={<PreferencesPage />} />
           <Route path="/seller" element={<SellerDashboard />} />
+        <Route path="/category/:categoryName" element={<CategoryPage />} />
+         <Route path="/search" element={<SearchResults />} />
+          
+          {/* 2. DYNAMIC PRODUCT ROUTE ADDED */}
+          {/* ':id' ek variable hai jo MongoDB ki ObjectId ko capture karega */}
+        <Route path="/product/:id" element={<ProductPage />} />
+
+        <Route path="/dashboard" element={<UserDashboard />} />  {/* ✅ */}
+
           <Route path="/cart" element={<Cart />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/checkout" element={<Checkout />} />
+  <Route path="/payment-success" element={<PaymentSuccess />} />
+
+
         </Routes>
       </BrowserRouter>
     </CartContext.Provider>
