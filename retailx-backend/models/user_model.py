@@ -12,33 +12,12 @@ class User:
             "name": name,
             "email": email,
             "password": password,
-            "contact": {},
-            "addresses": [],
-            "preferences": []   # ✅ added
+            "preferences": []   # stored in same user document
         })
 
     @staticmethod
-    def save_contact_and_address(email, contact, address):
+    def save_preferences(email, categories):
         return mongo.db.users.update_one(
             {"email": email},
-            {
-                "$set": {
-                    "contact": contact
-                },
-                "$push": {
-                    "addresses": address
-                }
-            }
-        )
-
-    # ✅ NEW: save/update preferences
-    @staticmethod
-    def save_preferences(email, preferences):
-        return mongo.db.users.update_one(
-            {"email": email},
-            {
-                "$set": {
-                    "preferences": preferences
-                }
-            }
+            {"$set": {"preferences": categories}}
         )

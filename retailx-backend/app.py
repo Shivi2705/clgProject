@@ -12,7 +12,10 @@ from routes.products import product_bp
 from routes.search import search_bp
 from routes.payment_routes import payment_bp
 from routes.user_routes import user_bp
-from routes.order_routes import orders_bp
+from routes.order import orders_bp
+from routes.recommendations import recommendation_bp
+from routes.chat import chat_bp
+
 
 load_dotenv()
 
@@ -59,6 +62,10 @@ app.register_blueprint(search_bp, url_prefix="/api/search")
 app.register_blueprint(payment_bp)
 app.register_blueprint(user_bp)
 app.register_blueprint(orders_bp)
+app.register_blueprint(recommendation_bp, url_prefix="/api/recommendations")
+app.register_blueprint(chat_bp, url_prefix="/api/chat")
+
+
 
 @app.route("/test-db")
 def test_db():

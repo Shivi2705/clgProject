@@ -3,13 +3,13 @@ from datetime import datetime
 
 class Order:
     @staticmethod
-    def create_order(email, items, total, address_details):
-        order_data = {
-            "email": email,           # Ye sabse imp hai Dashboard ke liye
-            "items": items,
+    def create_order(email, items, total, address_details, payment_id, created_at):
+        return mongo.db.orders.insert_one({
+            "email": email,
+            "items": items,  # This should be a list of dictionaries
             "total": total,
-            "address_details": address_details,
-            "status": "Processing",
-            "created_at": datetime.utcnow()
-        }
-        return mongo.db.orders.insert_one(order_data)
+            "address": address_details,
+            "payment_id": payment_id,
+            "status": "paid",
+            "created_at": created_at
+        })

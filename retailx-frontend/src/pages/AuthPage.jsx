@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 export default function AuthPage() {
-  const [mode, setMode] = useState("register");
+  const [mode, setMode] = useState("login"); // Default to login
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -21,25 +21,23 @@ export default function AuthPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
-  const [error, setError] = useState(""); // New state for error messages
+  const [error, setError] = useState("");
 
   const navigate = useNavigate();
 
-  // Password validation regex: min 8, at least 1 uppercase, at least 1 special char
+  // Password validation: min 8 chars, 1 uppercase, 1 special char
   const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*[\W_]).{8,}$/;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(""); // clear previous errors
+    setError("");
     setIsLoading(true);
 
-    // Frontend password validation
+    // 1. Frontend Validation
     if (mode === "register") {
       if (!PASSWORD_REGEX.test(password)) {
         setIsLoading(false);
-        setError(
-          "Password must be at least 8 characters long and include an uppercase letter and a special character."
-        );
+        setError("Password must be at least 8 chars, 1 uppercase, and 1 special char.");
         return;
       }
       if (password !== confirmPassword) {
@@ -50,14 +48,16 @@ export default function AuthPage() {
     }
 
     try {
-      let url = "http://127.0.0.1:5000/api/auth/register";
-      let payload = { name, email, password };
+      // 2. Determine API Endpoint
+      const url = mode === "login" 
+        ? "http://127.0.0.1:5000/api/auth/login" 
+        : "http://127.0.0.1:5000/api/auth/register";
+      
+      const payload = mode === "login" 
+        ? { email, password } 
+        : { name, email, password };
 
-      if (mode === "login") {
-        url = "http://127.0.0.1:5000/api/auth/login";
-        payload = { email, password };
-      }
-
+      // 3. API Request
       const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -66,18 +66,29 @@ export default function AuthPage() {
 
       const data = await response.json();
 
-      if (!response.ok) throw new Error(data.message || "Failed");
+      if (!response.ok) {
+        throw new Error(data.message || "Authentication failed");
+      }
 
-      // Save token
+      // 4. Critical Storage for Customer Dashboard
       localStorage.setItem("userToken", data.token);
+      localStorage.setItem("user_name", data.user?.name || name || "Shopper");
+      
+      // Store preferences as a JSON string for the AI buckets to use
+      const userPrefs = data.user?.preferences || [];
+      localStorage.setItem("user_preferences", JSON.stringify(userPrefs));
 
+      // 5. Intelligent Redirection
       if (mode === "register") {
+        // New users go to setup their interests
         navigate("/preferences");
       } else {
-        navigate("/");
+        // Successful login: Use window.location to force refresh Navbar state
+        window.location.href = "/customer-dashboard";
       }
+      
     } catch (err) {
-      setError(err.message || "Something went wrong");
+      setError(err.message || "Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -86,6 +97,7 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen bg-[#fcfcfd] flex flex-col font-sans text-slate-900">
       <main className="flex-1 flex items-center justify-center p-6 relative">
+        {/* Subtle background pattern */}
         <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]" />
 
         <motion.div
@@ -105,24 +117,32 @@ export default function AuthPage() {
               <p className="text-slate-500 text-sm mt-1.5 leading-relaxed">
                 {mode === "login"
                   ? "Enter your credentials to access your dashboard."
-                  : "Join thousands of businesses managing with RetailX."}
+                  : "Join RetailX to start your personalized shopping journey."}
               </p>
             </div>
 
-            {/* Error message */}
-            {error && (
-              <div className="mb-4 p-3 rounded-md bg-red-100 text-red-700 text-sm font-medium">
-                {error}
-              </div>
-            )}
+            {/* Error Message Display */}
+            <AnimatePresence>
+              {error && (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mb-6 p-3 rounded-lg bg-red-50 text-red-700 text-xs font-medium border border-red-100 flex items-center gap-2"
+                >
+                  <span className="w-1 h-1 rounded-full bg-red-400" />
+                  {error}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <AnimatePresence mode="popLayout">
                 {mode === "register" && (
                   <motion.div
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 10 }}
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
                   >
                     <Input
                       label="Full Name"
@@ -159,6 +179,7 @@ export default function AuthPage() {
                 focusedField={focusedField}
                 setFocusedField={setFocusedField}
                 placeholder="••••••••"
+                isLogin={mode === "login"}
               />
 
               {mode === "register" && (
@@ -193,9 +214,13 @@ export default function AuthPage() {
 
             <div className="mt-8 pt-6 border-t border-slate-50 text-center">
               <p className="text-sm text-slate-500">
-                {mode === "login" ? "New to the platform?" : "Already have an account?"}{" "}
+                {mode === "login" ? "New to RetailX?" : "Already have an account?"}{" "}
                 <button
-                  onClick={() => setMode(mode === "login" ? "register" : "login")}
+                  type="button"
+                  onClick={() => {
+                    setMode(mode === "login" ? "register" : "login");
+                    setError("");
+                  }}
                   className="text-emerald-600 font-semibold hover:text-emerald-700 transition-colors"
                 >
                   {mode === "login" ? "Create an account" : "Log in"}
@@ -209,7 +234,8 @@ export default function AuthPage() {
   );
 }
 
-// Input component
+// --- SUB-COMPONENTS ---
+
 function Input({ label, icon: Icon, value, setValue, placeholder, field, focusedField, setFocusedField }) {
   return (
     <div className="space-y-1.5">
@@ -217,6 +243,8 @@ function Input({ label, icon: Icon, value, setValue, placeholder, field, focused
       <div className="relative">
         <Icon className={`absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors duration-200 ${focusedField === field ? "text-emerald-600" : "text-slate-400"}`} />
         <input
+          required
+          type={field === "email" ? "email" : "text"}
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onFocus={() => setFocusedField(field)}
@@ -229,17 +257,19 @@ function Input({ label, icon: Icon, value, setValue, placeholder, field, focused
   );
 }
 
-// PasswordInput component
-function PasswordInput({ label, value, setValue, show, toggle, field, focusedField, setFocusedField, placeholder }) {
+function PasswordInput({ label, value, setValue, show, toggle, field, focusedField, setFocusedField, placeholder, isLogin }) {
   return (
     <div className="space-y-1.5">
       <div className="flex justify-between items-center px-1">
         <label className="text-[13px] font-medium text-slate-700">{label}</label>
-        {field === "password" && <button type="button" className="text-[12px] text-emerald-600 hover:underline font-medium">Forgot?</button>}
+        {isLogin && field === "password" && (
+          <button type="button" className="text-[12px] text-emerald-600 hover:underline font-medium">Forgot?</button>
+        )}
       </div>
       <div className="relative">
         <Lock className={`absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors duration-200 ${focusedField === field ? "text-emerald-600" : "text-slate-400"}`} />
         <input
+          required
           type={show ? "text" : "password"}
           value={value}
           onChange={(e) => setValue(e.target.value)}

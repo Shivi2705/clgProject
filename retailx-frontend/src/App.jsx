@@ -15,6 +15,7 @@ import ProductPage from "./pages/ProductPage";
 import Checkout from "./pages/Checkout";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import UserDashboard from "./pages/UserDashboard";
+import CustomerDashboard from "./pages/CustomerDashboard"; 
 
 // ✅ CONTEXT CREATE
 export const CartContext = createContext();
@@ -62,13 +63,12 @@ function App() {
           {/* ':id' ek variable hai jo MongoDB ki ObjectId ko capture karega */}
         <Route path="/product/:id" element={<ProductPage />} />
 
-        <Route path="/dashboard" element={<UserDashboard />} />  {/* ✅ */}
-
+<Route path="/dashboard" element={<UserDashboard />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/checkout" element={<Checkout />} />
   <Route path="/payment-success" element={<PaymentSuccess />} />
-
+            <Route path="/customer-dashboard" element={<CustomerDashboard />} />
 
         </Routes>
       </BrowserRouter>
