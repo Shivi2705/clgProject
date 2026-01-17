@@ -115,9 +115,9 @@ function StatCard({ label, value, trend, up }) {
     <Card className="border-none shadow-[0_4px_20px_rgba(0,0,0,0.03)] rounded-2xl bg-white p-8 group hover:shadow-xl transition-all duration-500">
       <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">{label}</p>
       <div className="flex items-center justify-between">
-        <h3 className="text-4xl font-black text-slate-900 tracking-tighter">{value}</h3>
+        <h3 className="text-4xl font-black text-slate-900 tracking-tighter">0</h3>
         <span className={`text-xs font-black px-2.5 py-1 rounded-lg ${up ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
-          {trend}
+          {0}
         </span>
       </div>
     </Card>

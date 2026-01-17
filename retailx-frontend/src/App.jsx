@@ -16,7 +16,8 @@ import Checkout from "./pages/Checkout";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import UserDashboard from "./pages/UserDashboard";
 import CustomerDashboard from "./pages/CustomerDashboard"; 
-
+import Wishlist from "./pages/Wishlist";
+import Deals from "./pages/Deals";
 // ✅ CONTEXT CREATE
 export const CartContext = createContext();
 
@@ -27,7 +28,7 @@ function App() {
 
   const addToCart = (product) => {
     console.log("ADD TO CART CLICKED:", product);
-
+    
     setCart((prevCart) => {
       const existingItem = prevCart.find(
         (item) => item.id === product.id
@@ -69,7 +70,8 @@ function App() {
           <Route path="/checkout" element={<Checkout />} />
   <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/customer-dashboard" element={<CustomerDashboard />} />
-
+<Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/deals" element={<Deals />} />
         </Routes>
       </BrowserRouter>
     </CartContext.Provider>

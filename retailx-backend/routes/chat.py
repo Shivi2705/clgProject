@@ -1,15 +1,13 @@
 import os
-import traceback
+import traceback # Error detail dekhne ke liye
 from flask import Blueprint, request, jsonify
 from google import genai
-from google.genai.errors import ClientError
 from extensions import mongo
 
-chat_bp = Blueprint("chat_bp", __name__)
+chat_bp = Blueprint('chat_bp', __name__)
 
-# Gemini Client
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-
+# AI Client
+client_ai = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 def get_products_from_db(query):
     try:
@@ -38,60 +36,65 @@ def get_products_from_db(query):
                 f"  Best for: {p.get('aiMetadata', {}).get('style', 'General')} styles and "
                 f"{p.get('aiMetadata', {}).get('concern', 'daily use')} concerns.\n"
             )
-
         print("Checking DB:", mongo.db.name, "Collection:", mongo.db.products.count_documents({}))
-        return product_list or "No products found."
-
+        return product_list if product_list else "No specific beauty products found."
     except Exception as e:
-        print("DB Error:", e)
-        return "Product data unavailable."
+        print("DB Fetch Error:", e)
+        return "Error fetching products."
 
-
-@chat_bp.route("/", methods=["POST", "OPTIONS"])
+@chat_bp.route('/', methods=['POST', 'OPTIONS']) # Slash change kiya yahan
 def chat_endpoint():
-    if request.method == "OPTIONS":
+    if request.method == 'OPTIONS':
         return jsonify({"status": "ok"}), 200
-
+        
     try:
         data = request.get_json()
-        if not data or "message" not in data:
-            return jsonify({"reply": "Message missing"}), 400
-
-        user_message = data["message"]
+        if not data:
+            return jsonify({"reply": "Bhai, request body empty hai!"}), 400
+            
+        user_message = data.get("message", "")
         context_data = get_products_from_db(user_message)
 
-        system_instruction = f"""
-You are the RetailX Beauty Expert ✨.
+        
 
-Available Products:
+        system_instruction = f"""
+You are the 'RetailX Beauty Expert' ✨.
+
+Current Inventory:
 {context_data}
 
-RULES:
-- Use Markdown
-- Bold product names
-- ₹ for prices
-- ⭐ for ratings
-- Friendly, premium tone
-- End with a helpful question
+STYLE RULES:
+1. **Formatting**: Use Markdown to make the response look beautiful.
+   - Use **bold** for product names.
+   - Use bullet points for features.
+   - Use `₹` for pricing.
+   - Use ⭐ for ratings.
+2. **Structure**:
+   - Start with a friendly greeting if it's the beginning of a chat.
+   - Group suggestions clearly.
+   - If recommending multiple products, use a clean list.
+3. **Tone**: Be helpful, like a high-end beauty consultant.
+4. **Call to Action**: End with a helpful question (e.g., "Would you like more details on any of these?").
+
+Example Output Style:
+"I found some perfect matches for you! ✨
+
+1. **[Product Name]** - 💰 Price: ₹999 
+   - ⭐ Rating: 4.5/5
+   - 🌸 Best for: [Concern]"
 """
 
-        response = client.models.generate_content(
-            model="gemini-2.0-flash",
+        # Gemini 2.5 Flash call
+        response = client_ai.models.generate_content(
+            model="gemini-2.5-flash",
             contents=f"{system_instruction}\nUser: {user_message}"
         )
 
         return jsonify({"reply": response.text})
 
-    except ClientError as ce:
-        # 🔥 QUOTA / BILLING ERROR HANDLED
-        if "RESOURCE_EXHAUSTED" in str(ce):
-            return jsonify({
-                "reply": "✨ Our beauty assistant is a bit busy right now. Please try again in a minute!"
-            }), 200
-
-        traceback.print_exc()
-        return jsonify({"reply": "AI service error"}), 500
-
-    except Exception:
-        traceback.print_exc()
-        return jsonify({"reply": "Server error"}), 500
+    except Exception as e:
+        # Ye line terminal mein bata degi ki EXACTLY kaunsi line phat rahi hai
+        print("-" * 30)
+        traceback.print_exc() 
+        print("-" * 30)
+        return jsonify({"reply": "System busy hai, terminal check karo."}), 500

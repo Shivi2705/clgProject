@@ -222,7 +222,7 @@ const UserDashboard = () => {
             {/* LEDGER TABLE */}
             <section className="bg-white border border-zinc-100">
               <div className="px-8 py-6 flex justify-between items-center border-b border-zinc-100">
-                <h3 className="text-[10px] font-black uppercase tracking-[0.3em]">Settlement Ledger</h3>
+                <h3 className="text-[10px] font-black uppercase tracking-[0.3em]">Orders</h3>
                 <div className="flex gap-2">
                   <div className="w-2 h-2 bg-zinc-900 rounded-full"></div>
                   <div className="w-2 h-2 bg-zinc-200 rounded-full"></div>
@@ -258,7 +258,7 @@ const UserDashboard = () => {
                         <td className="px-8 py-6">
                            <div className="flex items-center gap-1.5">
                              <div className="w-1 h-1 bg-zinc-900 rounded-full"></div>
-                             <span className="text-[10px] font-bold uppercase tracking-tighter text-zinc-900">Complete</span>
+                             <span className="text-[10px] font-bold uppercase tracking-tighter text-zinc-900">order confirmed </span>
                            </div>
                         </td>
                         <td className="px-8 py-6 text-right">

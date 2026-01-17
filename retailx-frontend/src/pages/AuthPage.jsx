@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+
 import {
   Mail,
   Lock,
@@ -84,7 +85,15 @@ export default function AuthPage() {
         navigate("/preferences");
       } else {
         // Successful login: Use window.location to force refresh Navbar state
-        window.location.href = "/customer-dashboard";
+        const redirectTo = localStorage.getItem("postAuthRedirect");
+
+if (redirectTo) {
+  localStorage.removeItem("postAuthRedirect");
+  window.location.href = redirectTo;
+} else {
+  window.location.href = "/customer-dashboard";
+}
+
       }
       
     } catch (err) {

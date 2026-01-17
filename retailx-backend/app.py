@@ -15,7 +15,7 @@ from routes.user_routes import user_bp
 from routes.order import orders_bp
 from routes.recommendations import recommendation_bp
 from routes.chat import chat_bp
-
+from routes.cart_routes import cart_bp 
 
 load_dotenv()
 
@@ -64,6 +64,8 @@ app.register_blueprint(user_bp)
 app.register_blueprint(orders_bp)
 app.register_blueprint(recommendation_bp, url_prefix="/api/recommendations")
 app.register_blueprint(chat_bp, url_prefix="/api/chat")
+# UPDATED: Cart Blueprint register kiya (Iska prefix /api/cart already route file mein set hai)
+app.register_blueprint(cart_bp) 
 
 
 

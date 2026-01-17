@@ -21,7 +21,7 @@ export default function Navbar() {
   };
 
   const isLoggedIn = !!localStorage.getItem("userToken");
-
+const homePath = isLoggedIn ? "/customer-dashboard" : "/";
 const handleLogout = () => {
   localStorage.removeItem("userToken");
   navigate("/auth");
@@ -50,7 +50,7 @@ const handleLogout = () => {
 
         {/* LEFT: Logo + Search */}
         <div className="flex items-center gap-10">
-          <Link to="/" className="text-xl font-bold text-slate-900 tracking-tight">
+          <Link to={homePath} className="text-xl font-bold text-slate-900 tracking-tight">
             Retail<span className="text-emerald-600">X</span>
           </Link>
 
@@ -73,7 +73,7 @@ const handleLogout = () => {
         {/* RIGHT: Links + Cart + Auth */}
         <div className="flex items-center gap-8">
           <div className="hidden md:flex items-center gap-7">
-            <NavLink to="/">Home</NavLink>
+            <NavLink to={homePath}>Home</NavLink>
 
             {/* PROFESSIONAL DROPDOWN START */}
             <div className="relative group">

@@ -93,19 +93,7 @@ export default function RetailXHome() {
                 </p>
                 <div className="flex flex-wrap gap-4 mt-8">
   {/* Primary Button - Locked to Emerald */}
-  <Button 
-    className="rounded-full px-8 py-4 text-base bg-[#059669] hover:bg-[#10b981] text-white font-bold border-none transition-all active:scale-95 shadow-lg shadow-emerald-900/20"
-  >
-    Explore Drop
-  </Button>
   
-  {/* Outline Button - Transparent with white border */}
-  <Button 
-    variant="outline" 
-    className="rounded-full px-8 py-4 text-base border-2 border-white/40 bg-transparent text-white backdrop-blur-sm hover:bg-white hover:text-black transition-all"
-  >
-    View Lookbook
-  </Button>
 </div>
               </motion.div>
             </div>
@@ -195,10 +183,6 @@ export default function RetailXHome() {
               NEVER MISS <br /> A DROP
             </h2>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <input 
-                placeholder="Enter your email" 
-                className="bg-white/5 border border-white/10 px-8 py-5 rounded-full text-white w-full sm:w-96 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
-              />
               
               <Button onClick={() => navigate("/auth")}className="bg-[#37cd9e] text-white rounded-full px-8 py-4 font-bold hover:bg-[#059669] w-full sm:w-auto transition-all duration-300 active:scale-95 shadow-xl shadow-slate-900/10 border-none"
 >

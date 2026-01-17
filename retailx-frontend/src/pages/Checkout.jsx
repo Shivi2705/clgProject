@@ -79,7 +79,6 @@ const Checkout = () => {
         <button onClick={() => window.history.back()} className="flex items-center gap-2 text-xs font-bold text-gray-400 hover:text-black transition-colors">
           <ChevronLeftIcon className="w-4 h-4" /> BACK
         </button>
-        <div className="text-xl font-black tracking-tighter">RETAIL<span className="text-blue-600">X</span></div>
         <div className="w-10"></div> {/* Spacer */}
       </header>
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Star, ShoppingCart, Zap, ChevronRight, ArrowRight, Plus, Check, ShieldCheck, Truck, RefreshCcw, Info, StarHalf } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion'; // Added for professional animations
+import { Star, Plus, Check, ShoppingBag, ArrowRight, ShieldCheck, Truck, RotateCcw, ChevronLeft, ChevronRight, Heart } from 'lucide-react';
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
 import { CartContext } from "../App";
@@ -15,8 +16,13 @@ const ProductPage = () => {
   const [frequentlyBought, setFrequentlyBought] = useState([]);
   const [similarProducts, setSimilarProducts] = useState([]);
   const [selectedAddons, setSelectedAddons] = useState([]);
+  const [activeTab, setActiveTab] = useState('description');
 
   const isInCart = cart.some(item => (item.id === id || item._id === id));
+
+  const isAuthenticated = () => {
+  return !!localStorage.getItem("userToken");
+};
 
   useEffect(() => {
     const fetchProductData = async () => {
@@ -53,198 +59,324 @@ const ProductPage = () => {
   };
 
   const handleFullPurchase = () => {
-    if (!isInCart && currentProduct) addToCart(currentProduct);
-    selectedAddons.forEach(addon => addToCart(addon));
-    navigate('/cart');
-  };
+  if (!localStorage.getItem("userToken")) {
+    localStorage.setItem("postAuthRedirect", `/product/${id}`);
+    navigate("/auth");
+    return;
+  }
+
+  if (!isInCart && currentProduct) addToCart(currentProduct);
+  selectedAddons.forEach(addon => addToCart(addon));
+  navigate("/cart");
+};
+
 
   if (loading) return (
-    <div className="h-screen flex flex-col items-center justify-center gap-4 bg-white">
-        <div className="w-10 h-10 border-4 border-slate-100 border-t-emerald-600 rounded-full animate-spin"></div>
-        <p className="text-slate-400 text-xs font-black uppercase tracking-widest">Loading Experience</p>
+    <div className="h-screen flex flex-col items-center justify-center gap-6 bg-white">
+      <div className="w-12 h-12 border-[3px] border-gray-100 border-t-black rounded-full animate-spin"></div>
+      <p className="text-black text-[10px] font-bold uppercase tracking-[0.4em]">Initializing Studio</p>
     </div>
   );
 
-  if (!currentProduct) return <div className="h-screen flex items-center justify-center">Product not found.</div>;
-
   return (
-    <div className="bg-white min-h-screen font-sans">
+    <div className="bg-white min-h-screen font-sans selection:bg-black selection:text-white">
       <Navbar />
 
-      <main className="max-w-7xl mx-auto px-6 pt-32 pb-20">
-        <nav className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-10">
-            <Link to="/" className="hover:text-emerald-600 transition">Home</Link>
-            <ChevronRight size={10} />
-            <span>{currentProduct?.category}</span>
-            <ChevronRight size={10} />
-            <span className="text-slate-900">{currentProduct?.brand}</span>
+      <main className="max-w-[1440px] mx-auto px-6 lg:px-12 pt-32 pb-20">
+        
+        {/* Breadcrumbs */}
+        <nav className="flex items-center gap-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-12">
+          <Link to="/" className="hover:text-black transition">Studio</Link>
+          <span className="w-1 h-1 rounded-full bg-gray-200"></span>
+          <span>{currentProduct?.category}</span>
+          <span className="w-1 h-1 rounded-full bg-gray-200"></span>
+          <span className="text-black">{currentProduct?.brand}</span>
         </nav>
 
-        <div className="flex flex-col lg:flex-row gap-16 items-start">
+        <div className="flex flex-col lg:flex-row gap-16 xl:gap-24 items-start">
           
-          {/* LEFT: IMAGE SECTION */}
-          <div className="w-full lg:w-[45%] lg:sticky lg:top-32">
-            <div className="aspect-[4/5] bg-slate-50 rounded-[2.5rem] flex items-center justify-center p-12 border border-slate-100 group overflow-hidden relative">
-                <img 
-                    src={currentProduct?.imageURL || currentProduct?.image} 
-                    alt={currentProduct?.name} 
-                    className="max-h-full max-w-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-700" 
-                />
-                <div className="absolute top-6 left-6 flex flex-col gap-2">
-                    <span className="bg-white/80 backdrop-blur px-3 py-1 rounded-full text-[9px] font-bold border border-slate-100 uppercase tracking-widest">New Arrival</span>
-                    {currentProduct?.stock < 10 && <span className="bg-red-50 text-red-600 px-3 py-1 rounded-full text-[9px] font-bold border border-red-100 uppercase tracking-widest">Limited Stock</span>}
-                </div>
-            </div>
+          {/* LEFT: MINIMALIST GALLERY */}
+          <div className="w-full lg:w-[55%] space-y-6">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="aspect-[4/5] bg-[#F7F7F7] rounded-sm flex items-center justify-center p-12 relative overflow-hidden group"
+            >
+              <img 
+                src={currentProduct?.imageURL || currentProduct?.image} 
+                alt={currentProduct?.name} 
+                className="max-h-full max-w-full object-contain transition-transform duration-1000 group-hover:scale-105" 
+              />
+              <button className="absolute top-8 right-8 w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform">
+                <Heart size={20} strokeWidth={1.5} />
+              </button>
+            </motion.div>
             
-            <div className="grid grid-cols-2 gap-4 mt-8">
-                <button 
-                    onClick={() => { if(isInCart) navigate('/cart'); else addToCart(currentProduct); }} 
-                    className={`py-5 rounded-2xl font-black text-xs uppercase tracking-widest transition-all duration-300 ${isInCart ? 'bg-slate-100 text-slate-900 border border-slate-200' : 'bg-slate-900 text-white hover:bg-emerald-600 shadow-xl shadow-slate-200'}`}
-                >
-                    {isInCart ? "In Bag — View" : "Add to Bag"}
-                </button>
-                <button className="bg-emerald-600 text-white py-5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-emerald-500 transition-all shadow-xl shadow-emerald-100">
-                    Express Buy
-                </button>
+            <div className="grid grid-cols-3 gap-6">
+                {[1,2,3].map((i) => (
+                    <div key={i} className="aspect-square bg-[#F7F7F7] rounded-sm opacity-50 hover:opacity-100 cursor-pointer transition-opacity"></div>
+                ))}
             </div>
           </div>
 
-          {/* RIGHT: CONTENT SECTION */}
-          <div className="w-full lg:w-[55%]">
-            <div className="space-y-6 border-b border-slate-100 pb-10">
-              <h1 className="text-4xl font-black text-slate-900 leading-[1.1] tracking-tighter">
-                {currentProduct?.name}
-              </h1>
-              
-              <div className="flex items-center gap-6">
-                <div className="flex items-center gap-1 bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full text-[10px] font-black border border-emerald-100">
-                    <Star size={10} className="fill-current" />
-                    <span>{currentProduct?.rating} / 5.0</span>
+          {/* RIGHT: ELEGANT CHECKOUT */}
+          <div className="w-full lg:w-[45%] lg:sticky lg:top-32">
+            <div className="space-y-8">
+              <div className="space-y-4">
+                <p className="text-[11px] font-black uppercase tracking-[0.3em] text-gray-400">{currentProduct?.brand}</p>
+                <h1 className="text-4xl xl:text-5xl font-medium text-black leading-[1.1] tracking-tight">
+                    {currentProduct?.name}
+                </h1>
+                
+                <div className="flex items-center gap-6 pt-2">
+                    <div className="flex items-center gap-1 text-sm font-bold">
+                        <Star size={14} className="fill-black" />
+                        <span>{currentProduct?.rating}</span>
+                        <span className="text-gray-300 font-normal ml-1">({currentProduct?.reviewsCount})</span>
+                    </div>
+                    <div className="h-4 w-px bg-gray-200"></div>
+                    <p className="text-[10px] font-bold text-green-600 uppercase tracking-widest">In Stock & Ready to ship</p>
                 </div>
-                <span className="text-slate-400 text-[11px] font-black uppercase tracking-widest underline underline-offset-4 decoration-slate-200">
-                    {currentProduct?.reviewsCount || 0} Customer Reviews
-                </span>
               </div>
 
               <div className="flex items-baseline gap-4">
-                <span className="text-4xl font-black text-slate-900 tracking-tighter">
-                    ₹{currentProduct?.finalPrice?.toLocaleString() || '0'}
+                <span className="text-3xl font-light text-black">
+                    ₹{currentProduct?.finalPrice?.toLocaleString()}
                 </span>
                 {currentProduct?.price > currentProduct?.finalPrice && (
-                    <span className="text-slate-400 line-through text-lg font-medium">₹{currentProduct?.price?.toLocaleString()}</span>
+                    <span className="text-gray-400 line-through text-lg">₹{currentProduct?.price?.toLocaleString()}</span>
                 )}
               </div>
-            </div>
 
-            {/* NEW: DETAILED DESCRIPTION SECTION */}
-            <div className="mt-10 space-y-4">
-                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">The Story</h3>
-                <p className="text-slate-600 leading-relaxed text-base font-medium">
-                    {currentProduct?.description || "Experience uncompromising quality and cutting-edge design. This product is engineered for those who demand performance without sacrificing style. Every detail has been meticulously crafted to provide an unparalleled user experience, making it a definitive choice for enthusiasts."}
-                </p>
-            </div>
+              {/* ACTION BUTTONS */}
+              <div className="space-y-3 pt-6">
+                <button onClick={() => {
+  if (!isAuthenticated()) {
+    localStorage.setItem("postAuthRedirect", `/product/${id}`);
+    navigate("/auth");
+    return;
+  }
 
-            {/* BUNDLE SECTION */}
-            {frequentlyBought.length > 0 && (
-                <div className="mt-12 bg-slate-50 rounded-[2rem] p-8 border border-slate-100">
-                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6">Pro-Curated Bundle</h3>
-                <div className="flex items-center gap-6 overflow-x-auto no-scrollbar">
-                    <div className="w-20 h-20 bg-white p-4 rounded-2xl border border-slate-100 flex-shrink-0">
-                        <img src={currentProduct?.imageURL} className="h-full w-full object-contain" alt="" />
-                    </div>
-                    {frequentlyBought.map((item) => (
-                    <React.Fragment key={item._id || item.id}>
-                        <Plus size={16} className="text-slate-300 flex-shrink-0" />
-                        <div 
-                            className={`group relative w-20 h-20 bg-white p-4 rounded-2xl border transition-all cursor-pointer ${selectedAddons.find(a => (a.id === item.id || a._id === item._id)) ? 'border-emerald-500 ring-4 ring-emerald-500/10 shadow-lg' : 'border-slate-100 hover:border-slate-300'}`}
-                            onClick={() => toggleAddon(item)}
-                        >
-                            <img src={item?.imageURL || item?.image} className="h-full w-full object-contain" alt="" />
-                            <div className={`absolute -top-2 -right-2 w-5 h-5 rounded-full flex items-center justify-center border shadow-sm ${selectedAddons.find(a => (a.id === item.id || a._id === item._id)) ? 'bg-emerald-500 text-white' : 'bg-white text-slate-200'}`}>
-                                <Check size={12} />
-                            </div>
-                        </div>
-                    </React.Fragment>
-                    ))}
-                </div>
-                <div className="mt-8 flex items-center justify-between bg-white p-6 rounded-2xl border border-slate-100">
-                    <div>
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Combined Value</p>
-                        <p className="text-xl font-black text-slate-900">₹{((currentProduct?.finalPrice || 0) + selectedAddons.reduce((acc, curr) => acc + (curr?.finalPrice || 0), 0)).toLocaleString()}</p>
-                    </div>
-                    <button onClick={handleFullPurchase} className="bg-slate-900 text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-md">Add {selectedAddons.length + 1} Items</button>
-                </div>
-                </div>
-            )}
+  if (isInCart) navigate("/cart");
+  else addToCart(currentProduct);
+}}
 
-            {/* RATINGS ANALYTICS SECTION */}
-            <div className="mt-16 bg-white border border-slate-100 rounded-[2rem] p-10">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 border-b border-slate-100 pb-10">
-                    <div className="space-y-1">
-                        <h2 className="text-5xl font-black text-slate-900 tracking-tighter">{currentProduct?.rating || '4.8'}</h2>
-                        <div className="flex text-emerald-500 gap-0.5">
-                            {[...Array(5)].map((_, i) => <Star key={i} size={16} className="fill-current" />)}
-                        </div>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest pt-2">Based on {currentProduct?.reviewsCount || '120'} Verified Buys</p>
+                    className={`w-full py-5 rounded-full font-bold text-[11px] uppercase tracking-[0.2em] transition-all duration-500 flex items-center justify-center gap-3 ${isInCart ? 'bg-gray-100 text-black border border-gray-200' : 'bg-black text-white hover:bg-gray-800'}`}
+                >
+                    {isInCart ? <><Check size={16} /> Added to Bag</> : <><ShoppingBag size={16} /> Add to Bag</>}
+                </button>
+                <button
+  onClick={() => {
+    if (!isAuthenticated()) {
+      localStorage.setItem("postAuthRedirect", `/product/${id}`);
+      navigate("/auth");
+      return;
+    }
+    navigate("/checkout");
+  }}
+  className="w-full py-5 rounded-full font-bold text-[11px] uppercase tracking-[0.2em] border border-black hover:bg-black hover:text-white transition-all"
+>
+  Direct Checkout
+</button>
+
+              </div>
+
+              {/* TRUST BADGES */}
+              <div className="grid grid-cols-3 gap-4 py-8 border-y border-gray-100">
+                <div className="flex flex-col items-center text-center gap-2">
+                    <Truck size={18} strokeWidth={1} />
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-gray-500 italic">Free Global Shipping</span>
+                </div>
+                <div className="flex flex-col items-center text-center gap-2">
+                    <ShieldCheck size={18} strokeWidth={1} />
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-gray-500 italic">2 Year Warranty</span>
+                </div>
+                <div className="flex flex-col items-center text-center gap-2">
+                    <RotateCcw size={18} strokeWidth={1} />
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-gray-500 italic">30 Day Returns</span>
+                </div>
+              </div>
+
+              {/* BUNDLE SYSTEM */}
+              {frequentlyBought.length > 0 && (
+                <div className="pt-4">
+                    <div className="flex justify-between items-end mb-6">
+                        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-black">Complete the Set</h3>
+                        <p className="text-[10px] font-bold text-gray-400">Save 10% on bundles</p>
                     </div>
-                    <div className="flex-grow max-w-xs w-full space-y-2">
-                        {[5, 4, 3, 2, 1].map((num) => (
-                            <div key={num} className="flex items-center gap-4">
-                                <span className="text-[10px] font-bold text-slate-400 w-2">{num}</span>
-                                <div className="flex-grow h-1 bg-slate-50 rounded-full overflow-hidden">
-                                    <div className="h-full bg-slate-900 rounded-full" style={{ width: `${num === 5 ? '85%' : num === 4 ? '10%' : '5%'}` }}></div>
+                    <div className="space-y-3">
+                        {frequentlyBought.map((item) => {
+                            const isSelected = selectedAddons.find(a => (a.id === item.id || a._id === item._id));
+                            return (
+                                <div 
+                                    key={item._id || item.id}
+                                    onClick={() => toggleAddon(item)}
+                                    className={`flex items-center gap-4 p-3 rounded-xl border transition-all cursor-pointer ${isSelected ? 'border-black bg-gray-50' : 'border-gray-100 hover:border-gray-200'}`}
+                                >
+                                    <div className="w-12 h-12 bg-white rounded-lg p-2 border border-gray-100">
+                                        <img src={item?.imageURL || item?.image} className="w-full h-full object-contain" alt="" />
+                                    </div>
+                                    <div className="flex-grow">
+                                        <p className="text-[10px] font-bold text-black uppercase truncate max-w-[150px]">{item.name}</p>
+                                        <p className="text-[10px] text-gray-400 mt-0.5">₹{item.finalPrice?.toLocaleString()}</p>
+                                    </div>
+                                    <div className={`w-5 h-5 rounded-full flex items-center justify-center border transition-colors ${isSelected ? 'bg-black border-black text-white' : 'border-gray-200 text-transparent'}`}>
+                                        <Check size={10} />
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            )
+                        })}
                     </div>
+                    {selectedAddons.length > 0 && (
+                        <button onClick={handleFullPurchase} className="mt-4 w-full py-3 bg-gray-100 text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-black hover:text-white transition-all">
+                            Add Ensemble (₹{((currentProduct?.finalPrice || 0) + selectedAddons.reduce((acc, curr) => acc + (curr?.finalPrice || 0), 0)).toLocaleString()})
+                        </button>
+                    )}
                 </div>
-                <div className="pt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-emerald-600"><Check size={18}/></div>
-                        <div><p className="text-xs font-black text-slate-900 uppercase">Durability</p><p className="text-[11px] text-slate-400">Rated Excellent for long-term use</p></div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-emerald-600"><Check size={18}/></div>
-                        <div><p className="text-xs font-black text-slate-900 uppercase">Value</p><p className="text-[11px] text-slate-400">Top 5% in category for price/performance</p></div>
-                    </div>
-                </div>
-            </div>
-
-            {/* TECH SPECS */}
-            <div className="mt-16 space-y-10">
-                <h3 className="text-xs font-black uppercase tracking-widest text-slate-900 flex items-center gap-3">
-                    <Info size={16} className="text-emerald-500" /> Full Specifications
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {currentProduct?.specs && Object.entries(currentProduct.specs).map(([k, v]) => (
-                        <div key={k} className="p-4 border border-slate-100 rounded-2xl flex flex-col gap-1 hover:bg-slate-50 transition-colors">
-                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{k}</span>
-                            <span className="text-sm text-slate-800 font-bold">{v}</span>
-                        </div>
-                    ))}
-                </div>
+              )}
             </div>
           </div>
         </div>
 
-        {/* RELATED PRODUCTS */}
-        <div className="mt-32">
-            <h3 className="text-2xl font-black text-slate-900 tracking-tighter mb-10">Explore Similar</h3>
-            <div className="flex overflow-x-auto gap-8 no-scrollbar pb-10">
+        {/* TABS SECTION: SPECS & STORY */}
+        <div className="mt-40 border-t border-gray-100 pt-20">
+            <div className="flex gap-12 mb-16 overflow-x-auto no-scrollbar border-b border-gray-50">
+                {['description', 'specifications', 'reviews'].map((tab) => (
+                    <button 
+                        key={tab}
+                        onClick={() => setActiveTab(tab)}
+                        className={`pb-6 text-[11px] font-black uppercase tracking-[0.3em] relative transition-colors ${activeTab === tab ? 'text-black' : 'text-gray-300 hover:text-gray-500'}`}
+                    >
+                        {tab}
+                        {activeTab === tab && <motion.div layoutId="tabLine" className="absolute bottom-0 left-0 right-0 h-0.5 bg-black" />}
+                    </button>
+                ))}
+            </div>
+
+            <div className="max-w-4xl">
+                <AnimatePresence mode="wait">
+                    {activeTab === 'description' && (
+  <motion.div 
+    initial={{ opacity: 0 }} 
+    animate={{ opacity: 1 }} 
+    className="grid grid-cols-1 md:grid-cols-2 gap-px bg-gray-100 border border-gray-100"
+  >
+    {/* Card 01: Core Philosophy */}
+    <div className="bg-white p-10 space-y-6">
+      <div className="flex justify-between items-start">
+        <span className="text-4xl font-light text-gray-200">01</span>
+        <div className="px-3 py-1 bg-black text-white text-[9px] font-black uppercase tracking-widest">Design</div>
+      </div>
+      <div className="space-y-3">
+        <h4 className="text-xs font-black uppercase tracking-[0.2em]">Masterful Engineering</h4>
+        <p className="text-sm text-gray-500 leading-relaxed font-medium">
+          {currentProduct?.description?.split('.')[0] || "Precision crafted for ultimate performance."}.
+        </p>
+      </div>
+    </div>
+
+    {/* Card 02: Performance */}
+    <div className="bg-white p-10 space-y-6">
+      <div className="flex justify-between items-start">
+        <span className="text-4xl font-light text-gray-200">02</span>
+        <div className="px-3 py-1 bg-gray-100 text-black text-[9px] font-black uppercase tracking-widest">Build</div>
+      </div>
+      <div className="space-y-3">
+        <h4 className="text-xs font-black uppercase tracking-[0.2em]">Material Excellence</h4>
+        <p className="text-sm text-gray-500 leading-relaxed font-medium">
+          Developed using architectural-grade materials ensuring a {currentProduct?.category} that withstands time.
+        </p>
+      </div>
+    </div>
+
+    {/* Card 03: Functionality */}
+    <div className="bg-white p-10 space-y-6">
+      <div className="flex justify-between items-start">
+        <span className="text-4xl font-light text-gray-200">03</span>
+        <div className="px-3 py-1 bg-gray-100 text-black text-[9px] font-black uppercase tracking-widest">Utility</div>
+      </div>
+      <div className="space-y-3">
+        <h4 className="text-xs font-black uppercase tracking-[0.2em]">Intuitive Interface</h4>
+        <p className="text-sm text-gray-500 leading-relaxed font-medium">
+          The {currentProduct?.name} features ergonomic touchpoints and a streamlined workflow for the enthusiast.
+        </p>
+      </div>
+    </div>
+
+    {/* Card 04: Summary */}
+    <div className="bg-white p-10 space-y-6">
+      <div className="flex justify-between items-start">
+        <span className="text-4xl font-light text-gray-200">04</span>
+        <div className="px-3 py-1 bg-gray-100 text-black text-[9px] font-black uppercase tracking-widest">Commitment</div>
+      </div>
+      <div className="space-y-3">
+        <h4 className="text-xs font-black uppercase tracking-[0.2em]">Studio Standard</h4>
+        <p className="text-sm text-gray-500 leading-relaxed font-medium">
+          Every unit undergoes a 12-point quality inspection to ensure it meets our {currentProduct?.brand} legacy.
+        </p>
+      </div>
+    </div>
+  </motion.div>
+)}
+
+                    {activeTab === 'specifications' && (
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-4">
+                            {currentProduct?.specs && Object.entries(currentProduct.specs).map(([k, v]) => (
+                                <div key={k} className="flex justify-between py-4 border-b border-gray-50">
+                                    <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{k}</span>
+                                    <span className="text-sm font-medium text-black">{v}</span>
+                                </div>
+                            ))}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+        </div>
+
+        {/* RELATED PRODUCTS - DISCOVER GRID */}
+        <div className="mt-40">
+            <div className="flex justify-between items-end mb-12">
+                <div className="space-y-2">
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest italic">Curated Selection</p>
+                    <h3 className="text-3xl font-medium text-black tracking-tight">You might also appreciate</h3>
+                </div>
+                <div className="flex gap-4">
+                    <button className="w-12 h-12 rounded-full border border-gray-100 flex items-center justify-center hover:bg-black hover:text-white transition-all">
+                        <ChevronLeft size={20} />
+                    </button>
+                    <button className="w-12 h-12 rounded-full border border-gray-100 flex items-center justify-center hover:bg-black hover:text-white transition-all">
+                        <ChevronRight size={20} />
+                    </button>
+                </div>
+            </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
               {similarProducts.map(p => (
-                <Link key={p._id || p.id} to={`/product/${p._id || p.id}`} className="min-w-[220px] group">
-                  <div className="aspect-square bg-slate-50 rounded-[2.5rem] flex items-center justify-center mb-5 p-8 group-hover:bg-slate-100 transition-all">
-                    <img src={p?.imageURL || p?.image} className="max-h-full max-w-full object-contain group-hover:scale-110 transition duration-700" alt="" />
+                <Link key={p._id || p.id} to={`/product/${p._id || p.id}`} className="group space-y-4">
+                  <div className="aspect-[4/5] bg-[#F7F7F7] rounded-sm flex items-center justify-center p-8 overflow-hidden relative">
+                    <img src={p?.imageURL || p?.image} className="max-h-full max-w-full object-contain transition-transform duration-700 group-hover:scale-110" alt="" />
+                    <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-transform">
+                            <Plus size={18} />
+                        </div>
+                    </div>
                   </div>
-                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{p?.brand}</p>
-                  <p className="text-sm font-bold text-slate-900 truncate group-hover:text-emerald-600 transition-colors">{p?.name}</p>
-                  <p className="text-sm font-black text-slate-900 mt-1">₹{p?.finalPrice?.toLocaleString() || '0'}</p>
+                  <div>
+                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{p?.brand}</p>
+                    <p className="text-sm font-medium text-black truncate mt-1 group-hover:underline">{p?.name}</p>
+                    <p className="text-sm font-light text-gray-600 mt-1">₹{p?.finalPrice?.toLocaleString()}</p>
+                  </div>
                 </Link>
               ))}
             </div>
         </div>
       </main>
       <Footer />
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      `}} />
     </div>
   );
 };

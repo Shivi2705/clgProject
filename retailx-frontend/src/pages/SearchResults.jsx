@@ -54,7 +54,7 @@ const category = searchParams.get("category");
       name: p.name,
       price: Number(p.finalPrice), // Cart page 'price' expect karta hai
       originalPrice: Number( p.price),
-      image: p.images && p.images.length > 0 ? p.images[0] : "https://via.placeholder.com/200",
+      image: p.imageURL || p.images?.[0] || "https://via.placeholder.com/200",
       seller: "RetailX Seller", // Dummy seller
       brand: p.brand
     };
@@ -141,12 +141,17 @@ const category = searchParams.get("category");
                     
                     <Link to={`/product/${p.id}`} className="block">
                       <div className="h-56 bg-white p-4 flex items-center justify-center relative">
-                        <img 
-                          src={p.images && p.images.length > 0 ? p.images[0] : "https://via.placeholder.com/200"} 
-                          alt={p.name} 
-                          className="h-full object-contain"
-                        />
-                        {p.rating && (
+                        <img
+  src={
+    p.imageURL ||
+    p.images?.[0] ||
+    "https://via.placeholder.com/200"
+  }
+  alt={p.name}
+  className="h-full object-contain"
+/>
+
+                        {p.rating >0&& (
                           <div className="absolute top-2 left-2 bg-green-600 text-white text-xs px-2 py-1 rounded flex items-center gap-1">
                             {p.rating} ★
                           </div>
