@@ -50,3 +50,32 @@
   background: #10b981; 
   border-radius: 10px;
 }
+.swal-high-z {
+  z-index: 9999 !important;
+}
+/* 🔥 FIX SweetAlert buttons broken by global styles */
+.swal2-actions {
+  display: flex !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  margin-top: 24px !important;
+}
+
+.swal2-confirm,
+.swal2-cancel {
+  min-width: 120px !important;
+  padding: 10px 18px !important;
+  border-radius: 12px !important;
+  font-weight: 700 !important;
+  text-align: center !important;
+}
+
+.swal2-confirm {
+  background-color: #10b981 !important;
+  color: white !important;
+}
+
+.swal2-cancel {
+  background-color: #64748b !important;
+  color: white !important;
+}

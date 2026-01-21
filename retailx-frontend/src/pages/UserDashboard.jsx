@@ -178,7 +178,6 @@ const UserDashboard = () => {
             <section className="pt-8 border-t border-zinc-100">
               <div className="flex justify-between items-center mb-8">
                 <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-300">Logistics Hubs</h2>
-                <button className="text-[10px] font-bold border border-zinc-900 px-3 py-1 hover:bg-zinc-900 hover:text-white transition-all">NEW +</button>
               </div>
               <div className="space-y-4">
                 {data.user.addresses?.map((addr) => (

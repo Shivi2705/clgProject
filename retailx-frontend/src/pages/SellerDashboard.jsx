@@ -119,12 +119,17 @@ const handleSubmitProduct = async (e) => {
   // --- 🗑️ DELETE PRODUCT ---
   const handleDelete = async (id) => {
     const result = await Swal.fire({
-      title: 'Delete ?',
-      text: "Are you sure you want to delete this product? This action cannot be undone.",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#ef4444',
-      confirmButtonText: 'Delete'
+        title: 'Delete?',
+        text: "Are you sure? This action cannot be undone.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Delete',
+        cancelButtonText: 'Cancel',
+        customClass: {
+            confirmButton: 'bg-red-600 text-white px-6 py-2 rounded-lg mx-2 hover:bg-red-700 focus:outline-none',
+            cancelButton: 'bg-slate-500 text-white px-6 py-2 rounded-lg mx-2 hover:bg-slate-600 focus:outline-none'
+        },
+        buttonsStyling: false 
     });
 
     if(result.isConfirmed){
@@ -680,7 +685,7 @@ const ProfileView = ({ seller }) => {
 
                 <div className="bg-white p-8 rounded-[2.5rem] border shadow-sm space-y-4">
                     <h3 className="text-[10px] font-black uppercase text-emerald-600 tracking-widest border-b pb-2">Compliance & Contact</h3>
-                    <DetailField label="GSTIN Number" value={formData.gstin} editable={editMode} onChange={(e) => setFormData({...formData, gstin: e.target.value})} />
+                    <DetailField label="Shop Number" value={formData.gstin} editable={editMode} onChange={(e) => setFormData({...formData, gstin: e.target.value})} />
                     <DetailField label="Contact Number" value={formData.contactNumber} editable={editMode} onChange={(e) => setFormData({...formData, contactNumber: e.target.value})} />
                     <DetailField label="Store Address" value={formData.businessAddress} editable={editMode} onChange={(e) => setFormData({...formData, businessAddress: e.target.value})} />
                 </div>

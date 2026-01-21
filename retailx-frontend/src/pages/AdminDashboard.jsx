@@ -25,7 +25,7 @@ export default function AdminDashboard() {
 
         <nav className="flex-1 px-4 space-y-1">
           <SidebarItem icon={BarChart3} label="Insights" active={active === "insights"} onClick={() => setActive("insights")} />
-          <SidebarItem icon={Users} label="Customers" active={active === "users"} onClick={() => setActive("users")} />
+          <SidebarItem icon={Users} label="Seller" active={active === "Seller"} onClick={() => setActive("Seller")} />
           <SidebarItem icon={Package} label="Inventory" active={active === "products"} onClick={() => setActive("products")} />
           <SidebarItem icon={IndianRupee} label="Payments" active={active === "orders"} onClick={() => setActive("orders")} />
           <SidebarItem icon={Tag} label="Promotions" active={active === "offers"} onClick={() => setActive("offers")} />

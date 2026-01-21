@@ -28,24 +28,38 @@ export default function AuthPage() {
 
   // Password validation: min 8 chars, 1 uppercase, 1 special char
   const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*[\W_]).{8,}$/;
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const NAME_REGEX = /^[A-Za-z ]{3,}$/;
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setIsLoading(true);
+  setError("");
+  if (!NAME_REGEX.test(name)) {
+    setIsLoading(false);
+    setError("Name should contain only letters and must be at least 3 characters long.");
+    return;
+  }
+  // 1. Email Format Validation (Check this first)
+  if (!EMAIL_REGEX.test(email)) {
+    setError("Please enter a valid email address (e.g., name@gmail.com).");
+    return;
+  }
 
-    // 1. Frontend Validation
-    if (mode === "register") {
-      if (!PASSWORD_REGEX.test(password)) {
-        setIsLoading(false);
-        setError("Password must be at least 8 chars, 1 uppercase, and 1 special char.");
-        return;
-      }
-      if (password !== confirmPassword) {
-        setIsLoading(false);
-        setError("Passwords do not match.");
-        return;
-      }
+  setIsLoading(true);
+
+  // 2. Register-specific Validation
+  if (mode === "register") {
+    if (!PASSWORD_REGEX.test(password)) {
+      setIsLoading(false);
+      setError("Password must be at least 8 chars, 1 uppercase, and 1 special char.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      setIsLoading(false);
+      setError("Passwords do not match.");
+      return;
+    }
     }
 
     try {

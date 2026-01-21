@@ -1,7 +1,7 @@
 
 import { useSearchParams, Link, useNavigate } from "react-router-dom"; // useNavigate add kiya
-import { useEffect, useState, useMemo, useContext } from "react"; // useContext add kiya
-import { CartContext } from "../App"; // CartContext import kiya
+import { useEffect, useState, useMemo, useContext } from "react"; 
+import { CartContext } from "../App"; 
 import Navbar from "../Components/Navbar";
 import Footer from "../components/Footer";
 
@@ -9,8 +9,8 @@ import Footer from "../components/Footer";
 export default function SearchResults() {
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q");
-  const navigate = useNavigate(); // Navigation ke liye
-  const { addToCart } = useContext(CartContext); // Global function use karne ke liye
+  const navigate = useNavigate(); 
+  const { addToCart } = useContext(CartContext); 
   
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,29 +22,34 @@ export default function SearchResults() {
 const category = searchParams.get("category");
 
 
-  useEffect(() => {
+ useEffect(() => {
   const fetchResults = async () => {
+    if (!query && !category) return;
     setLoading(true);
+    
     try {
-      let url = "http://127.0.0.1:5000/api/products?";
+      let url = `http://127.0.0.1:5000/api/search?`; 
+      
+      const params = new URLSearchParams();
+      if (query) params.append("q", query);
+      if (category) params.append("category", category);
 
-      if (query) url += `q=${query}&`;
-      if (category) url += `category=${category}`;
+      const finalUrl = url + params.toString();
+      console.log("Fetching from:", finalUrl);
 
-      const response = await fetch(url);
+      const response = await fetch(finalUrl);
       const data = await response.json();
-
       setProducts(data);
-      setVisibleCount(8);
     } catch (error) {
-      console.error("Fetch error:", error);
+      console.error("Search error:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  if (query || category) fetchResults();
+  fetchResults();
 }, [query, category]);
+ 
 
 
   // --- LOGIC: Add to Cart and Redirect ---
@@ -173,18 +178,16 @@ const category = searchParams.get("category");
 
                     <div className="px-4 pb-4">
                       {/* --- Update: OnClick call handleAddToCart --- */}
-                      <button 
-                        onClick={() => handleAddToCart(p)}
-                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-lg text-sm font-medium transition-colors"
-                      >
-                        Add to Cart
-                      </button>
+                        <button onClick={() => navigate(`/product/${p.id}`)} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-lg text-sm font-medium transition-colors">
+                           View Product
+                        </button>
+
                     </div>
                   </div>
                 ))
               ) : (
                 <div className="col-span-full text-center py-20">
-                  <p className="text-gray-500 text-lg">Hume "{query}" ke liye kuch nahi mila.</p>
+                  <p className="text-gray-500 text-lg">no product "{query}" </p>
                 </div>
               )}
             </div>

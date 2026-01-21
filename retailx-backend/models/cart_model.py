@@ -82,26 +82,4 @@ class Cart:
              "$set": {"updatedAt": datetime.utcnow()}}
         )
 
-    @staticmethod
-    def update_budget(user_id, monthly_budget):
-        return mongo.db.carts.update_one(
-            {"userId": ObjectId(user_id)},
-            {"$set": {"monthlyBudget": monthly_budget, "updatedAt": datetime.utcnow()}}
-        )
-
-    @staticmethod
-    def calculate_spent(cart):
-        if not cart: 
-            return {"spent": 0, "remaining": 0, "percentUsed": 0, "monthlyBudget": 2000}
-        
-        budget = cart.get("monthlyBudget", 2000)
-        spent = sum(item["price"] * item.get("quantity", 1) for item in cart.get("items", []))
-        remaining = budget - spent
-        percent_used = (spent / budget * 100) if budget > 0 else 0
-        
-        return {
-            "spent": spent,
-            "remaining": remaining,
-            "percentUsed": round(percent_used, 2),
-            "monthlyBudget": budget
-        }
+    

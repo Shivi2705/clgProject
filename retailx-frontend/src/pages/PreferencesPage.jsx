@@ -11,7 +11,7 @@ import {
 
 const CATEGORIES = [
   "Fashion", "Electronics", "Grocery", "Beauty", "Home & Living", "Sports",
-  "Books", "Toys", "Health & Wellness", "Jewelry", "Watches", "Shoes",
+  "Books", "Toys", "Health & Wellness", "Jewellery", "Watches", "Shoes",
   "Bags & Accessories", "Kids & Baby", "Pet Supplies", "Automotive",
   "Music & Instruments", "Gaming", "Stationery", "Office Supplies",
   "Kitchen & Dining", "Furniture", "Garden & Outdoors", "Art & Craft",

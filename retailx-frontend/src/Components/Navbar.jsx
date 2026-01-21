@@ -30,7 +30,7 @@ const handleLogout = () => {
 
   const CATEGORIES = [
     "Fashion", "Electronics", "Grocery", "Beauty", "Home & Living", "Sports",
-    "Books", "Toys", "Health & Wellness", "Jewelry", "Watches", "Shoes",
+    "Books", "Toys", "Health & Wellness", "Jewellery", "Watches", "Shoes",
     "Bags & Accessories", "Kids & Baby", "Pet Supplies", "Automotive",
     "Music & Instruments", "Gaming", "Stationery", "Office Supplies",
     "Kitchen & Dining", "Furniture", "Garden & Outdoors", "Art & Craft",
@@ -89,7 +89,7 @@ const handleLogout = () => {
                   <div className="bg-slate-50/50 px-8 py-4 border-b border-slate-100 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <LayoutGrid className="h-4 w-4 text-emerald-600" />
-                      <span className="text-xs font-bold uppercase tracking-wider text-slate-700">Browse All Departments</span>
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-700">Browse All categories</span>
                     </div>
                     
                   </div>
@@ -141,7 +141,7 @@ const handleLogout = () => {
 {!isLoggedIn ? (
   <Link to="/auth">
     <Button className="rounded-xl px-4 h-9 flex gap-2">
-      <User className="h-4 w-4" /> Register
+      <User className="h-4 w-4" /> Login
     </Button>
   </Link>
 ) : (

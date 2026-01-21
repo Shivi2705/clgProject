@@ -1,6 +1,3 @@
-
-
-
 import pandas as pd
 import random
 from sklearn.feature_extraction.text import TfidfVectorizer
